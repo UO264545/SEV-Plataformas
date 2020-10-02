@@ -7,7 +7,7 @@ GameLayer::GameLayer(Game* game)
 }
 
 void GameLayer::init() {
-	space = new Space(0);
+	space = new Space(1);
 	scrollX = 0;
 	tiles.clear();
 
@@ -58,15 +58,10 @@ void GameLayer::processControls() {
 		player->moveX(0);
 	}
 	// Eje Y
-	if (controlMoveY > 0) {
-		player->moveY(1);
+	if (controlMoveY < 0) {
+		player->jump();
 	}
-	else if (controlMoveY < 0) {
-		player->moveY(-1);
-	}
-	else {
-		player->moveY(0);
-	}
+	
 }
 
 void GameLayer::keysToControls(SDL_Event event) {
@@ -135,6 +130,9 @@ void GameLayer::keysToControls(SDL_Event event) {
 void GameLayer::update() {
 	using namespace std;
 
+	if (player->y > HEIGHT + player->height) // cuando el personaje cae del todo
+		init();
+
 	space->update();
 	background->update();
 	// Generar enemigos
@@ -200,7 +198,7 @@ void GameLayer::update() {
 void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
 	for (auto const& projectile : projectiles) {
 		// Eliminar proyectiles que salen por la derecha
-		if (!projectile->isInRender(scrollX)) {
+		if (!projectile->isInRender(scrollX) || projectile->vx == 0) {
 			bool pInList = std::find(deleteProjectiles.begin(),
 				deleteProjectiles.end(),
 				projectile) != deleteProjectiles.end();

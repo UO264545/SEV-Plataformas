@@ -4,6 +4,8 @@ Player::Player(float x, float y, Game* game)
 	: Actor("res/jugador.png", x, y, 50, 57, game) {
 	audioShoot = new Audio("res/efecto_disparo.wav", false);
 
+	onAir = false;
+
 	orientation = game->orientationRight;
 	state = game->stateMoving;
 
@@ -26,6 +28,12 @@ Player::Player(float x, float y, Game* game)
 
 void Player::update() {
 	bool endAnimation = animation->update();
+
+	if (collisionDown)
+		onAir = false;
+	else
+		onAir = true;
+
 	// Acabo la animación, no sabemos cual
 	if (endAnimation) {
 		// Estaba disparando
@@ -80,8 +88,11 @@ void Player::moveX(float axis) {
 	vx = axis * 3;
 }
 
-void Player::moveY(float axis) {
-	vy = axis * 3;
+void Player::jump() {
+	if (!onAir) { 
+		vy = -16;
+		onAir = true;
+	}
 }
 
 Projectile* Player::shoot() {
