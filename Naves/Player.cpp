@@ -74,8 +74,6 @@ void Player::update() {
 	if (shootTime > 0) {
 		shootTime--;
 	}
-	x = x + vx;
-	y = y + vy;
 }
 
 void Player::moveX(float axis) {
@@ -104,6 +102,6 @@ Projectile* Player::shoot() {
 	}
 }
 
-void Player::draw() {
-	animation->draw(x, y);
+void Player::draw(float scrollX) {
+	animation->draw(x - scrollX, y);
 }

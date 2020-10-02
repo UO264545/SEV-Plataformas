@@ -30,12 +30,11 @@ void Enemy::update() {
 	}
 	if (state != game->stateDying) {
 		vx = -1;
-		x = x + vx;
 	}
 }
 
-void Enemy::draw() {
-	animation->draw(x, y);
+void Enemy::draw(float scrollX) {
+	animation->draw(x - scrollX, y);
 }
 
 void Enemy::impacted() {
