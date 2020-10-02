@@ -12,16 +12,26 @@ public:
 	Projectile* shoot();
 	void update();
 	void moveX(float axis);
-	void moveY(float axis);
+	void jump();
 
 	void draw(float scrollX = 0) override; // Va a sobrescribir
+	
+	void loseLife();
+	int lifes = 3;
+	int invulnerableTime = 0;
+	
 	int orientation;
 	int state;
+
+	bool onAir;
 
 	Animation* aIdleRight;
 	Animation* aIdleLeft;
 	Animation* aRunningRight;
 	Animation* aRunningLeft;
+
+	Animation* aJumpingRight;
+	Animation* aJumpingLeft;
 
 	Animation* aShootingRight;
 	Animation* aShootingLeft;
