@@ -73,10 +73,10 @@ void Space::updateMoveRight(Actor* dynamicAct) {
 void Space::updateMoveLeft(Actor* dynamicAct) {
 	if (dynamicAct->vx < 0) {
 		int possibleMovement = dynamicAct->vx;
-		// El mejor "idealmente" vx partimos de ese
 		int leftDynamic = dynamicAct->x - dynamicAct->width / 2;
 		int topDynamic = dynamicAct->y - dynamicAct->height / 2;
 		int downDynamic = dynamicAct->y + dynamicAct->height / 2;
+		// El mejor "idealmente" vx partimos de ese
 		for (auto const& staticAct : staticActors) {
 			int rightStatic = staticAct->x + staticAct->width / 2;
 			int topStatic = staticAct->y - staticAct->height / 2;
@@ -100,6 +100,7 @@ void Space::updateMoveLeft(Actor* dynamicAct) {
 		// Restringir la velocidad actual (opcional)
 		dynamicAct->vx = possibleMovement;
 	}
+
 
 }
 

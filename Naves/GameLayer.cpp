@@ -231,7 +231,7 @@ void GameLayer::draw() {
 	for (auto const& tile : tiles)
 		tile->draw(scrollX);
 
-	player->draw();
+	player->draw(scrollX);
 
 	for (auto const& enemy : enemies) {
 		enemy->draw(scrollX);
