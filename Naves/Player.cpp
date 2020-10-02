@@ -104,6 +104,6 @@ Projectile* Player::shoot() {
 	}
 }
 
-void Player::draw() {
-	animation->draw(x, y);
+void Player::draw(float scrollX) {
+	animation->draw(x - scrollX, y);
 }

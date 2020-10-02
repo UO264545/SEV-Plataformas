@@ -38,6 +38,9 @@ public:
 	int mapWidth;
 	list<Tile*> tiles;
 
+	void calculateScroll();
+	float scrollX;
+
 	bool controlShoot = false;
 	int controlMoveX = 0;
 	int controlMoveY = 0;

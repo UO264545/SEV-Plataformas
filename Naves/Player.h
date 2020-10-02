@@ -14,7 +14,7 @@ public:
 	void moveX(float axis);
 	void moveY(float axis);
 
-	void draw() override; // Va a sobrescribir
+	void draw(float scrollX = 0) override; // Va a sobrescribir
 	int orientation;
 	int state;
 

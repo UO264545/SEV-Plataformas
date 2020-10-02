@@ -7,6 +7,7 @@ GameLayer::GameLayer(Game* game)
 }
 
 void GameLayer::init() {
+	scrollX = 0;
 	tiles.clear();
 
 	audioBackground = new Audio("res/musica_ambiente.mp3", true);
@@ -217,19 +218,21 @@ void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteE
 }
 
 void GameLayer::draw() {
+	calculateScroll();
+
 	//primero el background y después el player, sino no se ve el player
 	background->draw();
 	for (auto const& tile : tiles)
-		tile->draw();
+		tile->draw(scrollX);
 
 	player->draw();
 
 	for (auto const& enemy : enemies) {
-		enemy->draw();
+		enemy->draw(scrollX);
 	}
 
 	for (auto const& projectile : projectiles) {
-		projectile->draw();
+		projectile->draw(scrollX);
 	}
 
 	textPoints->draw();
@@ -289,4 +292,8 @@ void GameLayer::loadMapObject(char character, float x, float y)
 		break;
 	}
 	}
+}
+
+void GameLayer::calculateScroll() {
+	scrollX = player->x - 200;
 }
