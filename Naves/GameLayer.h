@@ -7,8 +7,11 @@
 #include "Projectile.h"
 #include "Text.h"
 #include "Audio.h"
+#include "Tile.h"
 
 #include <list>
+#include <fstream> // Leer ficheros
+#include <sstream> // Leer lineas / string
 
 class GameLayer : public Layer
 {
@@ -29,6 +32,11 @@ public:
 
 	Text* textPoints;
 	int points;
+
+	void loadMap(std::string name);
+	void loadMapObject(char character, float x, float y);
+	int mapWidth;
+	list<Tile*> tiles;
 
 	bool controlShoot = false;
 	int controlMoveX = 0;
