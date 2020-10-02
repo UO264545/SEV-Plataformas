@@ -41,8 +41,8 @@ bool Actor::isOverlap(Actor* actor) {
 	return overlap;
 }
 
-bool Actor::isInRender() {
-	if (x - width / 2 <= WIDTH && x + width / 2 >= 0 &&
+bool Actor::isInRender(float scrollX) {
+	if ((x -scrollX) - width / 2 <= WIDTH && (x - scrollX) + width / 2 >= 0 &&
 		y - height / 2 <= HEIGHT && y + height / 2 >= 0) {
 		return true;
 	}

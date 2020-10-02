@@ -7,7 +7,7 @@ public:
 	Actor(std::string filename, float x, float y, int width, int height, Game* game);
 	~Actor();
 	virtual void draw(float scrollX = 0);
-	bool isInRender();
+	bool isInRender(float scrollX = 0);
 	bool isOverlap(Actor* actor);
 	SDL_Texture* texture;
 	float x; //posicion en x

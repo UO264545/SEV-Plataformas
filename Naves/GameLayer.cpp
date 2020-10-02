@@ -7,6 +7,7 @@ GameLayer::GameLayer(Game* game)
 }
 
 void GameLayer::init() {
+	space = new Space(0);
 	scrollX = 0;
 	tiles.clear();
 
@@ -42,6 +43,7 @@ void GameLayer::processControls() {
 	if (controlShoot) {
 		Projectile* newProjectile = player->shoot();
 		if (newProjectile != NULL) {
+			space->addDynamicActor(newProjectile);
 			projectiles.push_back(newProjectile);
 		}
 	}
@@ -133,6 +135,7 @@ void GameLayer::keysToControls(SDL_Event event) {
 void GameLayer::update() {
 	using namespace std;
 
+	space->update();
 	background->update();
 	// Generar enemigos
 	/*newEnemyTime--;
@@ -179,11 +182,13 @@ void GameLayer::update() {
 
 	for (auto const& delEnemy : deleteEnemies) {
 		enemies.remove(delEnemy);
+		space->removeDynamicActor(delEnemy);
 	}
 	deleteEnemies.clear();
 
 	for (auto const& delProjectile : deleteProjectiles) {
 		projectiles.remove(delProjectile);
+		space->removeDynamicActor(delProjectile);
 		delete delProjectile;
 	}
 	deleteProjectiles.clear();
@@ -195,7 +200,7 @@ void GameLayer::update() {
 void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
 	for (auto const& projectile : projectiles) {
 		// Eliminar proyectiles que salen por la derecha
-		if (!projectile->isInRender()) {
+		if (!projectile->isInRender(scrollX)) {
 			bool pInList = std::find(deleteProjectiles.begin(),
 				deleteProjectiles.end(),
 				projectile) != deleteProjectiles.end();
@@ -276,12 +281,14 @@ void GameLayer::loadMapObject(char character, float x, float y)
 		// modificación para empezar a contar desde el suelo.
 		enemy->y = enemy->y - enemy->height / 2;
 		enemies.push_back(enemy);
+		space->addDynamicActor(enemy);
 		break;
 	}
 	case '1': {
 		player = new Player(x, y, game);
 		// modificación para empezar a contar desde el suelo.
 		player->y = player->y - player->height / 2;
+		space->addDynamicActor(player);
 		break;
 	}
 	case '#': {
@@ -289,11 +296,24 @@ void GameLayer::loadMapObject(char character, float x, float y)
 		// modificación para empezar a contar desde el suelo.
 		tile->y = tile->y - tile->height / 2;
 		tiles.push_back(tile);
+		space->addStaticActor(tile);
 		break;
 	}
 	}
 }
 
 void GameLayer::calculateScroll() {
-	scrollX = player->x - 200;
+	// limite izquierda
+	if (player->x > WIDTH * 0.3) {// Dentro del límite del mapa
+		if (player->x - scrollX < WIDTH * 0.3) {
+			scrollX = player->x - WIDTH * 0.3;
+		}
+	}
+
+	// limite derecha
+	if (player->x < mapWidth - WIDTH * 0.3) { // Dentro del límite del mapa
+		if (player->x - scrollX > WIDTH * 0.7) {
+			scrollX = player->x - WIDTH * 0.7;
+		}
+	}
 }

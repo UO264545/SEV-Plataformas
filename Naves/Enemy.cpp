@@ -30,7 +30,6 @@ void Enemy::update() {
 	}
 	if (state != game->stateDying) {
 		vx = -1;
-		x = x + vx;
 	}
 }
 

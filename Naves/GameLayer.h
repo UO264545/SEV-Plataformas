@@ -8,6 +8,7 @@
 #include "Text.h"
 #include "Audio.h"
 #include "Tile.h"
+#include "Space.h"
 
 #include <list>
 #include <fstream> // Leer ficheros
@@ -40,6 +41,8 @@ public:
 
 	void calculateScroll();
 	float scrollX;
+
+	Space* space;
 
 	bool controlShoot = false;
 	int controlMoveX = 0;
