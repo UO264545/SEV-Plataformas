@@ -15,6 +15,11 @@ public:
 	void jump();
 
 	void draw(float scrollX = 0) override; // Va a sobrescribir
+	
+	void loseLife();
+	int lifes = 3;
+	int invulnerableTime = 0;
+	
 	int orientation;
 	int state;
 
