@@ -277,7 +277,18 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
+	case '.': {
+		Tile* tile = new Tile("res/bloque_fondo_muro.png", x, y, game);
+		// modificación para empezar a contar desde el suelo
+		tile->y = tile->y - tile->height / 2;
+		tiles.push_back(tile);
+		// NO SE AÑADE AL SPACE FISICO
+		break;
+	}
 	case 'E': {
+		// Primero añadir Tile - Fondo en la misma posición
+		loadMapObject('.', x, y);
+
 		Enemy* enemy = new Enemy(x, y, game);
 		// modificación para empezar a contar desde el suelo.
 		enemy->y = enemy->y - enemy->height / 2;
@@ -286,6 +297,9 @@ void GameLayer::loadMapObject(char character, float x, float y)
 		break;
 	}
 	case '1': {
+		// Primero añadir Tile - Fondo en la misma posición
+		loadMapObject('.', x, y);
+
 		player = new Player(x, y, game);
 		// modificación para empezar a contar desde el suelo.
 		player->y = player->y - player->height / 2;
