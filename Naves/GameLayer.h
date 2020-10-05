@@ -9,6 +9,7 @@
 #include "Audio.h"
 #include "Tile.h"
 #include "Space.h"
+#include "DestructibleBlock.h"
 
 #include <list>
 #include <fstream> // Leer ficheros
@@ -21,7 +22,7 @@ public:
 	void init() override;
 	void processControls() override;
 	void update() override;
-	void checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles);
+	void checkColisionProjectile(std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles);
 	void draw() override;
 	void keysToControls(SDL_Event event);
 
@@ -51,5 +52,6 @@ public:
 
 	std::list<Enemy*> enemies;
 	std::list<Projectile*> projectiles;
+	std::list<DestructibleBlock*> destructibleBlocks;
 };
 
