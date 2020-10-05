@@ -151,10 +151,14 @@ void GameLayer::update() {
 	for (auto const& projectile : projectiles) {
 		projectile->update();
 	}
+	for (auto const& block : destructibleBlocks) {
+		block->update();
+	}
 
 	// Colisiones
 	list<Enemy*> deleteEnemies;
 	list<Projectile*> deleteProjectiles;
+	list<DestructibleBlock*> deleteBlocks;
 	
 	for (auto const& enemy : enemies) {
 		// Eliminar enemigos que salen por la izquierda
@@ -167,8 +171,9 @@ void GameLayer::update() {
 				return; // Cortar el for
 			}
 		}
-		checkColisionEnemyShoot(enemy, deleteEnemies, deleteProjectiles);
 	}
+
+	checkColisionProjectile(deleteEnemies, deleteProjectiles);
 
 	for (auto const& enemy : enemies) {
 		if (enemy->state == game->stateDead) {
@@ -177,6 +182,17 @@ void GameLayer::update() {
 				enemy) != deleteEnemies.end();
 			if (!eInList) {
 				deleteEnemies.push_back(enemy);
+			}
+		}
+	}
+
+	for (auto const& block : destructibleBlocks) {
+		if (block->state == game->stateDead) {
+			bool bInList = std::find(deleteBlocks.begin(),
+				deleteBlocks.end(),
+				block) != deleteBlocks.end();
+			if (!bInList) {
+				deleteBlocks.push_back(block);
 			}
 		}
 	}
@@ -194,11 +210,17 @@ void GameLayer::update() {
 	}
 	deleteProjectiles.clear();
 
+	for (auto const& delBlock : deleteBlocks) {
+		destructibleBlocks.remove(delBlock);
+		space->removeStaticActor(delBlock);
+	}
+	deleteProjectiles.clear();
+
 	// cout << "update GameLayer" << endl;
 }
 
 // Colisión Enemy - Shoot
-void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
+void GameLayer::checkColisionProjectile(std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
 	for (auto const& projectile : projectiles) {
 		// Eliminar proyectiles que salen por la derecha
 		if (!projectile->isInRender(scrollX) || projectile->vx == 0) {
@@ -209,16 +231,29 @@ void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteE
 				deleteProjectiles.push_back(projectile);
 			}
 		}
-		if (enemy->isOverlap(projectile)) {
-			bool pInList = std::find(deleteProjectiles.begin(),
-				deleteProjectiles.end(),
-				projectile) != deleteProjectiles.end();
-			if (!pInList) {
-				deleteProjectiles.push_back(projectile);
+		for (auto const& enemy : enemies) {
+			if (enemy->isOverlap(projectile)) {
+				bool pInList = std::find(deleteProjectiles.begin(),
+					deleteProjectiles.end(),
+					projectile) != deleteProjectiles.end();
+				if (!pInList) {
+					deleteProjectiles.push_back(projectile);
+				}
+				enemy->impacted();
+				points++;
+				textPoints->content = std::to_string(points);
 			}
-			enemy->impacted();
-			points++;
-			textPoints->content = std::to_string(points);
+		}
+		for (auto const& block : destructibleBlocks) {
+			if (projectile->isOverlap(block)) {
+				bool pInList = std::find(deleteProjectiles.begin(),
+					deleteProjectiles.end(),
+					projectile) != deleteProjectiles.end();
+				if (!pInList) {
+					deleteProjectiles.push_back(projectile);
+				}
+				block->collide();
+			}
 		}
 	}
 }
@@ -239,6 +274,10 @@ void GameLayer::draw() {
 
 	for (auto const& projectile : projectiles) {
 		projectile->draw(scrollX);
+	}
+
+	for (auto const& block : destructibleBlocks) {
+		block->draw(scrollX);
 	}
 
 	textPoints->draw();
@@ -277,18 +316,14 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
-	case '.': {
-		Tile* tile = new Tile("res/bloque_fondo_muro.png", x, y, game);
-		// modificación para empezar a contar desde el suelo
-		tile->y = tile->y - tile->height / 2;
-		tiles.push_back(tile);
-		// NO SE AÑADE AL SPACE FISICO
+	case 'D': {
+		DestructibleBlock* block = new DestructibleBlock(x, y, game);
+		block->y = block->y - block->height / 2;
+		destructibleBlocks.push_back(block);
+		space->addStaticActor(block);
 		break;
 	}
 	case 'E': {
-		// Primero añadir Tile - Fondo en la misma posición
-		loadMapObject('.', x, y);
-
 		Enemy* enemy = new Enemy(x, y, game);
 		// modificación para empezar a contar desde el suelo.
 		enemy->y = enemy->y - enemy->height / 2;
@@ -297,9 +332,6 @@ void GameLayer::loadMapObject(char character, float x, float y)
 		break;
 	}
 	case '1': {
-		// Primero añadir Tile - Fondo en la misma posición
-		loadMapObject('.', x, y);
-
 		player = new Player(x, y, game);
 		// modificación para empezar a contar desde el suelo.
 		player->y = player->y - player->height / 2;
