@@ -21,7 +21,7 @@ public:
 	void init() override;
 	void processControls() override;
 	void update() override;
-	void checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles);
+	void checkColisionShoot(std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles);
 	void draw() override;
 	void keysToControls(SDL_Event event);
 
