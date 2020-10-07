@@ -167,8 +167,9 @@ void GameLayer::update() {
 				return; // Cortar el for
 			}
 		}
-		checkColisionEnemyShoot(enemy, deleteEnemies, deleteProjectiles);
 	}
+
+	checkColisionShoot(deleteEnemies, deleteProjectiles);
 
 	for (auto const& enemy : enemies) {
 		if (enemy->state == game->stateDead) {
@@ -198,7 +199,7 @@ void GameLayer::update() {
 }
 
 // Colisión Enemy - Shoot
-void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
+void GameLayer::checkColisionShoot(std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
 	for (auto const& projectile : projectiles) {
 		// Eliminar proyectiles que salen por la derecha
 		if (!projectile->isInRender(scrollX) || projectile->vx == 0) {
@@ -209,16 +210,18 @@ void GameLayer::checkColisionEnemyShoot(Enemy* enemy, std::list<Enemy*> &deleteE
 				deleteProjectiles.push_back(projectile);
 			}
 		}
-		if (enemy->isOverlap(projectile)) {
-			bool pInList = std::find(deleteProjectiles.begin(),
-				deleteProjectiles.end(),
-				projectile) != deleteProjectiles.end();
-			if (!pInList) {
-				deleteProjectiles.push_back(projectile);
+		for (auto const& enemy : enemies) {
+			if (enemy->isOverlap(projectile)) {
+				bool pInList = std::find(deleteProjectiles.begin(),
+					deleteProjectiles.end(),
+					projectile) != deleteProjectiles.end();
+				if (!pInList) {
+					deleteProjectiles.push_back(projectile);
+				}
+				enemy->impacted();
+				points++;
+				textPoints->content = std::to_string(points);
 			}
-			enemy->impacted();
-			points++;
-			textPoints->content = std::to_string(points);
 		}
 	}
 }
