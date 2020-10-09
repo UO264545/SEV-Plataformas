@@ -7,6 +7,10 @@ GameLayer::GameLayer(Game* game)
 }
 
 void GameLayer::init() {
+	pad = new Pad(WIDTH * 0.15, HEIGHT * 0.8, game);
+	buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
+	buttonShoot = new Actor("res/boton_disparo.png", WIDTH * 0.75, HEIGHT * 0.83, 100, 100, game);
+
 	space = new Space(1);
 	scrollX = 0;
 	tiles.clear();
@@ -29,14 +33,29 @@ void GameLayer::init() {
 	//enemies.push_back(new Enemy(300, 50, game));
 	//enemies.push_back(new Enemy(300, 200, game));
 
-	loadMap("res/0.txt");
+	loadMap("res/" + std::to_string(game->currentLevel) + ".txt");
 }
 
 void GameLayer::processControls() {
 	//obtener controles
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
-		keysToControls(event);
+		if (event.type == SDL_QUIT) {
+			game->loopActive = false;
+			return;
+		}
+		// Cambio automático de input
+		if (event.type == SDL_KEYDOWN) {
+			game->input = GameInputType::KEYBOARD;
+		}
+		if (event.type == SDL_MOUSEBUTTONDOWN) {
+			game->input = GameInputType::MOUSE;
+		}
+		// Procesar teclas
+		if(game->input == GameInputType::KEYBOARD)
+			keysToControls(event);
+		else if(game->input == GameInputType::MOUSE)
+			mouseToControls(event);
 	}
 
 	// Disparar
@@ -65,10 +84,6 @@ void GameLayer::processControls() {
 }
 
 void GameLayer::keysToControls(SDL_Event event) {
-	if (event.type == SDL_QUIT) {
-		game->loopActive = false;
-	}
-
 	if (event.type == SDL_KEYDOWN) {
 		int code = event.key.keysym.sym;
 		// Pulsada
@@ -127,8 +142,70 @@ void GameLayer::keysToControls(SDL_Event event) {
 	}
 }
 
+void GameLayer::mouseToControls(SDL_Event event) {
+	// Modificación de coordenadas por posible escalado
+	float motionX = event.motion.x / game->scaleLower;
+	float motionY = event.motion.y / game->scaleLower;
+	// Cada vez que hacen click
+	if (event.type == SDL_MOUSEBUTTONDOWN) {
+		if (pad->containsPoint(motionX, motionY)) {
+			controlMoveX = pad->getOrientationX(motionX);
+			pad->clicked = true;
+		}
+		else {
+			controlMoveX = 0;
+			pad->clicked = false;
+		}
+		if (buttonShoot->containsPoint(motionX, motionY)) {
+			controlShoot = true;
+		}
+		if (buttonJump->containsPoint(motionX, motionY)) {
+			controlMoveY = -1;
+		}
+	}
+	// Cada vez que se mueve
+	if (event.type == SDL_MOUSEMOTION) {
+		if (pad->clicked 
+			&& pad->containsPoint(motionX, motionY)) {
+			controlMoveX = pad->getOrientationX(motionX);
+			// Rango de -20 a 20 es igual que 0
+			if (controlMoveX > -20 && controlMoveX < 20)
+				controlMoveX = 0;
+		} else {
+			controlMoveX = 0;
+		}
+		if (!buttonShoot->containsPoint(motionX, motionY))
+			controlShoot = false;
+		if (!buttonJump->containsPoint(motionX, motionY)) {
+			controlMoveY = 0;
+		}
+	}
+	// Cada vez que levantan el click
+	if (event.type == SDL_MOUSEBUTTONUP) {
+		if (pad->containsPoint(motionX, motionY)) {
+			pad->clicked = false;
+			controlMoveX = 0;
+		}
+		if (buttonShoot->containsPoint(motionX, motionY)) {
+			controlShoot = false;
+		}
+		if (buttonJump->containsPoint(motionX, motionY)) {
+			controlMoveY = 0;
+		}
+	}
+}
+
 void GameLayer::update() {
 	using namespace std;
+
+	// Nivel superado
+	if (cup->isOverlap(player)) {
+		game->currentLevel++;
+		if (game->currentLevel > game->finalLevel) {
+			game->currentLevel = 0;
+		}
+		init();
+	}
 
 	if (player->y > HEIGHT + player->height) // cuando el personaje cae del todo
 		init();
@@ -194,8 +271,6 @@ void GameLayer::update() {
 		delete delProjectile;
 	}
 	deleteProjectiles.clear();
-
-	// cout << "update GameLayer" << endl;
 }
 
 // Colisión Enemy - Shoot
@@ -234,6 +309,8 @@ void GameLayer::draw() {
 	for (auto const& tile : tiles)
 		tile->draw(scrollX);
 
+	cup->draw(scrollX);
+
 	player->draw(scrollX);
 
 	for (auto const& enemy : enemies) {
@@ -244,8 +321,14 @@ void GameLayer::draw() {
 		projectile->draw(scrollX);
 	}
 
+	// HUD
 	textPoints->draw();
 	backgroundPoints->draw(); //asi no lo tapa un enemigo
+	if (game->input == GameInputType::MOUSE) {
+		buttonJump->draw(); // NO TIENEN SCROLL, POSICIÓN FIJA
+		buttonShoot->draw();
+		pad->draw();
+	}
 
 	SDL_RenderPresent(game->renderer); // Renderiza
 }
@@ -280,6 +363,13 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
+	case 'C': {
+		cup = new Tile("res/copa.png", x, y, game);
+		// modificación para empezar a contar desde el suelo.
+		cup->y = cup->y - cup->height / 2;
+		space->addDynamicActor(cup);
+		break;
+	}
 	case 'E': {
 		Enemy* enemy = new Enemy(x, y, game);
 		// modificación para empezar a contar desde el suelo.

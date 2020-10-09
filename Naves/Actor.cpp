@@ -1,5 +1,6 @@
 #include "Actor.h"
 Actor::Actor(std::string filename, float x, float y, int width, int height, Game* game) {
+	clicked = false;
 	this->game = game;
 	texture = game->getTexture(filename);
 	this->x = x;
@@ -50,4 +51,14 @@ bool Actor::isInRender(float scrollX) {
 }
 
 Actor::~Actor() {
+}
+
+bool Actor::containsPoint(int pointX, int pointY) {
+	if (pointY >= y - height / 2 &&
+		pointY <= y + height / 2 &&
+		pointX <= x + width / 2 &&
+		pointX >= x - width / 2) {
+		return true;
+	}
+	return false;
 }

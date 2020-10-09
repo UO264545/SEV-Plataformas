@@ -16,6 +16,10 @@
 #include "Layer.h"
 class Layer;
 
+enum class GameInputType {
+	KEYBOARD, GAMEPAD, MOUSE
+};
+
 class Game
 {
 public:
@@ -30,7 +34,10 @@ public:
 	SDL_Window* window; // ventana
 	SDL_Renderer* renderer; // renderizador
 	bool loopActive; // Juego activo
+
 	Layer* gameLayer;
+	Layer* layer; // ventana activa
+	Layer* menuLayer;
 
 	int const stateMoving = 1;
 	int const stateJumping = 2;
@@ -40,5 +47,10 @@ public:
 
 	int const orientationRight = 1;
 	int const orientationLeft = 2;
+
+	int currentLevel = 0;
+	int finalLevel = 2;
+
+	GameInputType input;
 };
 

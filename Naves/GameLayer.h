@@ -9,6 +9,7 @@
 #include "Audio.h"
 #include "Tile.h"
 #include "Space.h"
+#include "Pad.h"
 
 #include <list>
 #include <fstream> // Leer ficheros
@@ -39,6 +40,8 @@ public:
 	int mapWidth;
 	list<Tile*> tiles;
 
+	Tile* cup;
+
 	void calculateScroll();
 	float scrollX;
 
@@ -51,5 +54,12 @@ public:
 
 	std::list<Enemy*> enemies;
 	std::list<Projectile*> projectiles;
+
+	// Elementos de interfaz
+	Pad* pad;
+	Actor* buttonJump;
+	Actor* buttonShoot;
+
+	void mouseToControls(SDL_Event event); //USO DE MOUSE
 };
 
