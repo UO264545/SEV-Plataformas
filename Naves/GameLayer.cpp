@@ -7,6 +7,7 @@ GameLayer::GameLayer(Game* game)
 }
 
 void GameLayer::init() {
+	pad = new Pad(WIDTH * 0.15, HEIGHT * 0.8, game);
 	buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
 	buttonShoot = new Actor("res/boton_disparo.png", WIDTH * 0.75, HEIGHT * 0.83, 100, 100, game);
 
@@ -39,8 +40,22 @@ void GameLayer::processControls() {
 	//obtener controles
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
-		keysToControls(event);
-		mouseToControls(event);
+		if (event.type == SDL_QUIT) {
+			game->loopActive = false;
+			return;
+		}
+		// Cambio automático de input
+		if (event.type == SDL_KEYDOWN) {
+			game->input = GameInputType::KEYBOARD;
+		}
+		if (event.type == SDL_MOUSEBUTTONDOWN) {
+			game->input = GameInputType::MOUSE;
+		}
+		// Procesar teclas
+		if(game->input == GameInputType::KEYBOARD)
+			keysToControls(event);
+		else if(game->input == GameInputType::MOUSE)
+			mouseToControls(event);
 	}
 
 	// Disparar
@@ -69,10 +84,6 @@ void GameLayer::processControls() {
 }
 
 void GameLayer::keysToControls(SDL_Event event) {
-	if (event.type == SDL_QUIT) {
-		game->loopActive = false;
-	}
-
 	if (event.type == SDL_KEYDOWN) {
 		int code = event.key.keysym.sym;
 		// Pulsada
@@ -137,6 +148,14 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	float motionY = event.motion.y / game->scaleLower;
 	// Cada vez que hacen click
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
+		if (pad->containsPoint(motionX, motionY)) {
+			controlMoveX = pad->getOrientationX(motionX);
+			pad->clicked = true;
+		}
+		else {
+			controlMoveX = 0;
+			pad->clicked = false;
+		}
 		if (buttonShoot->containsPoint(motionX, motionY)) {
 			controlShoot = true;
 		}
@@ -146,6 +165,15 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	}
 	// Cada vez que se mueve
 	if (event.type == SDL_MOUSEMOTION) {
+		if (pad->clicked 
+			&& pad->containsPoint(motionX, motionY)) {
+			controlMoveX = pad->getOrientationX(motionX);
+			// Rango de -20 a 20 es igual que 0
+			if (controlMoveX > -20 && controlMoveX < 20)
+				controlMoveX = 0;
+		} else {
+			controlMoveX = 0;
+		}
 		if (!buttonShoot->containsPoint(motionX, motionY))
 			controlShoot = false;
 		if (!buttonJump->containsPoint(motionX, motionY)) {
@@ -154,6 +182,10 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	}
 	// Cada vez que levantan el click
 	if (event.type == SDL_MOUSEBUTTONUP) {
+		if (pad->containsPoint(motionX, motionY)) {
+			pad->clicked = false;
+			controlMoveX = 0;
+		}
 		if (buttonShoot->containsPoint(motionX, motionY)) {
 			controlShoot = false;
 		}
@@ -292,8 +324,11 @@ void GameLayer::draw() {
 	// HUD
 	textPoints->draw();
 	backgroundPoints->draw(); //asi no lo tapa un enemigo
-	buttonJump->draw(); // NO TIENEN SCROLL, POSICIÓN FIJA
-	buttonShoot->draw();
+	if (game->input == GameInputType::MOUSE) {
+		buttonJump->draw(); // NO TIENEN SCROLL, POSICIÓN FIJA
+		buttonShoot->draw();
+		pad->draw();
+	}
 
 	SDL_RenderPresent(game->renderer); // Renderiza
 }

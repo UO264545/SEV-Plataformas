@@ -69,6 +69,9 @@
     <ClCompile Include="Space.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="Pad.cpp">
+      <Filter>Archivos de origen\Actores</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="Space.h">
       <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Pad.h">
+      <Filter>Archivos de encabezado\Actores</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@
 #include "Audio.h"
 #include "Tile.h"
 #include "Space.h"
+#include "Pad.h"
 
 #include <list>
 #include <fstream> // Leer ficheros
@@ -55,6 +56,7 @@ public:
 	std::list<Projectile*> projectiles;
 
 	// Elementos de interfaz
+	Pad* pad;
 	Actor* buttonJump;
 	Actor* buttonShoot;
 

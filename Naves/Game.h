@@ -16,6 +16,10 @@
 #include "Layer.h"
 class Layer;
 
+enum class GameInputType {
+	KEYBOARD, GAMEPAD, MOUSE
+};
+
 class Game
 {
 public:
@@ -43,5 +47,7 @@ public:
 
 	int currentLevel = 0;
 	int finalLevel = 2;
+
+	GameInputType input;
 };
 
