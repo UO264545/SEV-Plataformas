@@ -3,6 +3,9 @@
 GameLayer::GameLayer(Game* game)
 	: Layer(game) {
 		//llama al constructor del padre : Layer(renderer)
+	pause = true;
+	message = new Actor("res/mensaje_como_jugar.png", WIDTH * 0.5, HEIGHT * 0.5,
+		WIDTH, HEIGHT, game);
 	init();
 }
 
@@ -56,6 +59,11 @@ void GameLayer::processControls() {
 			keysToControls(event);
 		else if(game->input == GameInputType::MOUSE)
 			mouseToControls(event);
+	}
+
+	if (controlContinue) {
+		pause = false;
+		controlContinue = false;
 	}
 
 	// Disparar
@@ -148,6 +156,7 @@ void GameLayer::mouseToControls(SDL_Event event) {
 	float motionY = event.motion.y / game->scaleLower;
 	// Cada vez que hacen click
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
+		controlContinue = true;
 		if (pad->containsPoint(motionX, motionY)) {
 			controlMoveX = pad->getOrientationX(motionX);
 			pad->clicked = true;
@@ -197,6 +206,10 @@ void GameLayer::mouseToControls(SDL_Event event) {
 
 void GameLayer::update() {
 	using namespace std;
+
+	if (pause) {
+		return;
+	}
 
 	// Nivel superado
 	if (cup->isOverlap(player)) {
@@ -328,6 +341,10 @@ void GameLayer::draw() {
 		buttonJump->draw(); // NO TIENEN SCROLL, POSICIÓN FIJA
 		buttonShoot->draw();
 		pad->draw();
+	}
+
+	if (pause) {
+		message->draw();
 	}
 
 	SDL_RenderPresent(game->renderer); // Renderiza

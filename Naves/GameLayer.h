@@ -60,6 +60,11 @@ public:
 	Actor* buttonJump;
 	Actor* buttonShoot;
 
+	Actor* message;
+	bool pause;
+
+	bool controlContinue = false;
+
 	void mouseToControls(SDL_Event event); //USO DE MOUSE
 };
 
