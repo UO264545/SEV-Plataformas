@@ -29,7 +29,7 @@ void GameLayer::init() {
 	//enemies.push_back(new Enemy(300, 50, game));
 	//enemies.push_back(new Enemy(300, 200, game));
 
-	loadMap("res/0.txt");
+	loadMap("res/" + std::to_string(game->currentLevel) + ".txt");
 }
 
 void GameLayer::processControls() {
@@ -129,6 +129,15 @@ void GameLayer::keysToControls(SDL_Event event) {
 
 void GameLayer::update() {
 	using namespace std;
+
+	// Nivel superado
+	if (cup->isOverlap(player)) {
+		game->currentLevel++;
+		if (game->currentLevel > game->finalLevel) {
+			game->currentLevel = 0;
+		}
+		init();
+	}
 
 	if (player->y > HEIGHT + player->height) // cuando el personaje cae del todo
 		init();
@@ -234,6 +243,8 @@ void GameLayer::draw() {
 	for (auto const& tile : tiles)
 		tile->draw(scrollX);
 
+	cup->draw(scrollX);
+
 	player->draw(scrollX);
 
 	for (auto const& enemy : enemies) {
@@ -280,6 +291,13 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
+	case 'C': {
+		cup = new Tile("res/copa.png", x, y, game);
+		// modificación para empezar a contar desde el suelo.
+		cup->y = cup->y - cup->height / 2;
+		space->addDynamicActor(cup);
+		break;
+	}
 	case 'E': {
 		Enemy* enemy = new Enemy(x, y, game);
 		// modificación para empezar a contar desde el suelo.

@@ -39,6 +39,8 @@ public:
 	int mapWidth;
 	list<Tile*> tiles;
 
+	Tile* cup;
+
 	void calculateScroll();
 	float scrollX;
 
