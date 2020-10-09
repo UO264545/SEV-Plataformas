@@ -53,5 +53,11 @@ public:
 
 	std::list<Enemy*> enemies;
 	std::list<Projectile*> projectiles;
+
+	// Elementos de interfaz
+	Actor* buttonJump;
+	Actor* buttonShoot;
+
+	void mouseToControls(SDL_Event event); //USO DE MOUSE
 };
 

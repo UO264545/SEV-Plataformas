@@ -7,6 +7,9 @@ GameLayer::GameLayer(Game* game)
 }
 
 void GameLayer::init() {
+	buttonJump = new Actor("res/boton_salto.png", WIDTH * 0.9, HEIGHT * 0.55, 100, 100, game);
+	buttonShoot = new Actor("res/boton_disparo.png", WIDTH * 0.75, HEIGHT * 0.83, 100, 100, game);
+
 	space = new Space(1);
 	scrollX = 0;
 	tiles.clear();
@@ -37,6 +40,7 @@ void GameLayer::processControls() {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		keysToControls(event);
+		mouseToControls(event);
 	}
 
 	// Disparar
@@ -127,6 +131,38 @@ void GameLayer::keysToControls(SDL_Event event) {
 	}
 }
 
+void GameLayer::mouseToControls(SDL_Event event) {
+	// Modificación de coordenadas por posible escalado
+	float motionX = event.motion.x / game->scaleLower;
+	float motionY = event.motion.y / game->scaleLower;
+	// Cada vez que hacen click
+	if (event.type == SDL_MOUSEBUTTONDOWN) {
+		if (buttonShoot->containsPoint(motionX, motionY)) {
+			controlShoot = true;
+		}
+		if (buttonJump->containsPoint(motionX, motionY)) {
+			controlMoveY = -1;
+		}
+	}
+	// Cada vez que se mueve
+	if (event.type == SDL_MOUSEMOTION) {
+		if (!buttonShoot->containsPoint(motionX, motionY))
+			controlShoot = false;
+		if (!buttonJump->containsPoint(motionX, motionY)) {
+			controlMoveY = 0;
+		}
+	}
+	// Cada vez que levantan el click
+	if (event.type == SDL_MOUSEBUTTONUP) {
+		if (buttonShoot->containsPoint(motionX, motionY)) {
+			controlShoot = false;
+		}
+		if (buttonJump->containsPoint(motionX, motionY)) {
+			controlMoveY = 0;
+		}
+	}
+}
+
 void GameLayer::update() {
 	using namespace std;
 
@@ -203,8 +239,6 @@ void GameLayer::update() {
 		delete delProjectile;
 	}
 	deleteProjectiles.clear();
-
-	// cout << "update GameLayer" << endl;
 }
 
 // Colisión Enemy - Shoot
@@ -255,8 +289,11 @@ void GameLayer::draw() {
 		projectile->draw(scrollX);
 	}
 
+	// HUD
 	textPoints->draw();
 	backgroundPoints->draw(); //asi no lo tapa un enemigo
+	buttonJump->draw(); // NO TIENEN SCROLL, POSICIÓN FIJA
+	buttonShoot->draw();
 
 	SDL_RenderPresent(game->renderer); // Renderiza
 }

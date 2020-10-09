@@ -22,5 +22,8 @@ public:
 	int fileWidth;
 	int fileHeight;
 	Game* game; // referencia al juego
+
+	bool containsPoint(int pointX, int pointY); //Contiene punto
+	bool clicked;
 };
 
