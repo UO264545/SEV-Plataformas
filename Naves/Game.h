@@ -34,7 +34,10 @@ public:
 	SDL_Window* window; // ventana
 	SDL_Renderer* renderer; // renderizador
 	bool loopActive; // Juego activo
+
 	Layer* gameLayer;
+	Layer* layer; // ventana activa
+	Layer* menuLayer;
 
 	int const stateMoving = 1;
 	int const stateJumping = 2;

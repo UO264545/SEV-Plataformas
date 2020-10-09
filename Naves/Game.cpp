@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "GameLayer.h"
+#include "MenuLayer.h"
 
 Game::Game() {
 	using namespace std; //mejor a nivel de función para no provocar colisiones de funciones (si queremos hacer una funcion cout)
@@ -16,7 +17,9 @@ Game::Game() {
 	// https://wiki.libsdl.org/SDL_HINT_RENDER_SCALE_QUALITY
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
+	menuLayer = new MenuLayer(this);
 	gameLayer = new GameLayer(this);
+	layer = menuLayer;
 
 	// fuentes
 	TTF_Init();
@@ -33,11 +36,11 @@ void Game::loop() {
 	while (loopActive) {
 		initTick = SDL_GetTicks();
 		// Controles
-		gameLayer->processControls();
+		layer->processControls();
 		// Actualizar elementos
-		gameLayer->update();
+		layer->update();
 		// Dibujar
-		gameLayer->draw();
+		layer->draw();
 		endTick = SDL_GetTicks();
 		differenceTick = endTick - initTick;
 		if (differenceTick < (1000 / 30)) {
