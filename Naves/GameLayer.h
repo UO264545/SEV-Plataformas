@@ -11,6 +11,7 @@
 #include "Space.h"
 #include "Pad.h"
 #include "DestructibleBlock.h"
+#include "IceBlock.h"
 
 #include <list>
 #include <fstream> // Leer ficheros
@@ -58,6 +59,7 @@ public:
 	std::list<Enemy*> enemies;
 	std::list<Projectile*> projectiles;
 	std::list<DestructibleBlock*> destructibleBlocks;
+	std::list<IceBlock*> iceBlocks;
 
 	// Elementos de interfaz
 	Pad* pad;

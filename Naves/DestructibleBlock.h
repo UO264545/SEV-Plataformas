@@ -7,6 +7,7 @@ class DestructibleBlock : public Actor
 {
 public:
 	DestructibleBlock(float x, float y, Game* game);
+	DestructibleBlock(std::string fileIdle, int width, int height, float x, float y, Game* game);
 
 	int state = game->stateIdle;
 

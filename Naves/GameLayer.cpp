@@ -259,11 +259,21 @@ void GameLayer::update() {
 		block->update();
 	}
 
+	for (auto const& block : iceBlocks) {
+		block->update();
+	}
+
 	// Colisiones
 	list<Enemy*> deleteEnemies;
 	list<Projectile*> deleteProjectiles;
 	list<DestructibleBlock*> deleteBlocks;
+	list<IceBlock*> deleteIceBlocks;
 	
+	// Comprobar que el jugador está sobre los bloques de hielo
+	for (auto const& block : iceBlocks) {
+		block->checkCollision(player);
+	}
+
 	for (auto const& enemy : enemies) {
 		// Eliminar enemigos que salen por la izquierda
 		if (enemy->x < 0)
@@ -304,6 +314,28 @@ void GameLayer::update() {
 		}
 	}
 
+	for (auto const& block : iceBlocks) {
+		if (block->state == game->stateDead) {
+			bool bInList = std::find(deleteIceBlocks.begin(),
+				deleteIceBlocks.end(),
+				block) != deleteIceBlocks.end();
+			if (!bInList) {
+				deleteIceBlocks.push_back(block);
+			}
+		}
+	}
+
+	for (auto const& block : destructibleBlocks) {
+		if (block->state == game->stateDead) {
+			bool bInList = std::find(deleteBlocks.begin(),
+				deleteBlocks.end(),
+				block) != deleteBlocks.end();
+			if (!bInList) {
+				deleteBlocks.push_back(block);
+			}
+		}
+	}
+
 	for (auto const& delEnemy : deleteEnemies) {
 		enemies.remove(delEnemy);
 		space->removeDynamicActor(delEnemy);
@@ -315,14 +347,19 @@ void GameLayer::update() {
 		space->removeDynamicActor(delProjectile);
 		delete delProjectile;
 	}
+	deleteProjectiles.clear();
 
 	for (auto const& delBlock : deleteBlocks) {
 		destructibleBlocks.remove(delBlock);
 		space->removeStaticActor(delBlock);
 	}
-	deleteProjectiles.clear();
+	deleteBlocks.clear();
 
-	deleteProjectiles.clear();
+	for (auto const& delBlock : deleteIceBlocks) {
+		iceBlocks.remove(delBlock);
+		space->removeStaticActor(delBlock);
+	}
+	deleteIceBlocks.clear();
 }
 
 // Colisión Enemy - Shoot
@@ -389,6 +426,10 @@ void GameLayer::draw() {
 		block->draw(scrollX);
 	}
 
+	for (auto const& block : iceBlocks) {
+		block->draw(scrollX);
+	}
+
 	// HUD
 	textPoints->draw();
 	backgroundPoints->draw(); //asi no lo tapa un enemigo
@@ -438,6 +479,13 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
+	case 'W': {
+		IceBlock* block = new IceBlock(x, y, game);
+		block->y = block->y - block->height / 2;
+		iceBlocks.push_back(block);
+		space->addStaticActor(block);
+		break;
+	}
 	case 'U': {
 		DestructibleBlock* block = new DestructibleBlock(x, y, game);
 		block->y = block->y - block->height / 2;
