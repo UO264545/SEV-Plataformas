@@ -36,6 +36,8 @@ void GameLayer::init() {
 	//enemies.push_back(new Enemy(300, 50, game));
 	//enemies.push_back(new Enemy(300, 200, game));
 
+	destructibleBlocks.clear();
+
 	loadMap("res/" + std::to_string(game->currentLevel) + ".txt");
 
 	for (int i = 0; i < Player::INITIAL_LIFES; i++) {
@@ -253,9 +255,14 @@ void GameLayer::update() {
 		projectile->update();
 	}
 
+	for (auto const& block : destructibleBlocks) {
+		block->update();
+	}
+
 	// Colisiones
 	list<Enemy*> deleteEnemies;
 	list<Projectile*> deleteProjectiles;
+	list<DestructibleBlock*> deleteBlocks;
 	
 	for (auto const& enemy : enemies) {
 		// Eliminar enemigos que salen por la izquierda
@@ -286,6 +293,17 @@ void GameLayer::update() {
 		}
 	}
 
+	for (auto const& block : destructibleBlocks) {
+		if (block->state == game->stateDead) {
+			bool bInList = std::find(deleteBlocks.begin(),
+				deleteBlocks.end(),
+				block) != deleteBlocks.end();
+			if (!bInList) {
+				deleteBlocks.push_back(block);
+			}
+		}
+	}
+
 	for (auto const& delEnemy : deleteEnemies) {
 		enemies.remove(delEnemy);
 		space->removeDynamicActor(delEnemy);
@@ -297,6 +315,13 @@ void GameLayer::update() {
 		space->removeDynamicActor(delProjectile);
 		delete delProjectile;
 	}
+
+	for (auto const& delBlock : deleteBlocks) {
+		destructibleBlocks.remove(delBlock);
+		space->removeStaticActor(delBlock);
+	}
+	deleteProjectiles.clear();
+
 	deleteProjectiles.clear();
 }
 
@@ -325,6 +350,18 @@ void GameLayer::checkColisionShoot(std::list<Enemy*> &deleteEnemies, std::list<P
 				textPoints->content = std::to_string(points);
 			}
 		}
+
+		for (auto const& block : destructibleBlocks) {
+			if (projectile->isOverlap(block)) {
+				bool pInList = std::find(deleteProjectiles.begin(),
+					deleteProjectiles.end(),
+					projectile) != deleteProjectiles.end();
+				if (!pInList) {
+					deleteProjectiles.push_back(projectile);
+				}
+				block->collide();
+			}
+		}
 	}
 }
 
@@ -346,6 +383,10 @@ void GameLayer::draw() {
 
 	for (auto const& projectile : projectiles) {
 		projectile->draw(scrollX);
+	}
+
+	for (auto const& block : destructibleBlocks) {
+		block->draw(scrollX);
 	}
 
 	// HUD
@@ -397,6 +438,13 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
+	case 'U': {
+		DestructibleBlock* block = new DestructibleBlock(x, y, game);
+		block->y = block->y - block->height / 2;
+		destructibleBlocks.push_back(block);
+		space->addStaticActor(block);
+		break;
+	}
 	case 'C': {
 		cup = new Tile("res/copa.png", x, y, game);
 		// modificación para empezar a contar desde el suelo.
