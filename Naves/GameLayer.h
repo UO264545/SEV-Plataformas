@@ -30,6 +30,8 @@ public:
 	Background* background;
 	Actor* backgroundPoints;
 	
+	Actor* backgroundLifes[Player::INITIAL_LIFES];
+
 	Audio* audioBackground;
 
 	Text* textPoints;

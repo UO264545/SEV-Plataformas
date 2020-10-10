@@ -37,6 +37,10 @@ void GameLayer::init() {
 	//enemies.push_back(new Enemy(300, 200, game));
 
 	loadMap("res/" + std::to_string(game->currentLevel) + ".txt");
+
+	for (int i = 0; i < Player::INITIAL_LIFES; i++) {
+		backgroundLifes[i] = new Actor("res/icono_vidas.png", WIDTH * 0.1 + (i * WIDTH * 0.075), HEIGHT * 0.11, 40, 40, game);
+	}
 }
 
 void GameLayer::processControls() {
@@ -340,6 +344,9 @@ void GameLayer::draw() {
 	// HUD
 	textPoints->draw();
 	backgroundPoints->draw(); //asi no lo tapa un enemigo
+	for (int i = 0; i < player->lifes; i++) {
+		backgroundLifes[i]->draw();
+	}
 	if (game->input == GameInputType::MOUSE) {
 		buttonJump->draw(); // NO TIENEN SCROLL, POSICIÓN FIJA
 		buttonShoot->draw();

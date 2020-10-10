@@ -17,7 +17,8 @@ public:
 	void draw(float scrollX = 0) override; // Va a sobrescribir
 	
 	void loseLife();
-	int lifes = 3;
+	static int const INITIAL_LIFES = 3;
+	int lifes = INITIAL_LIFES;
 	int invulnerableTime = 0;
 	
 	int orientation;
