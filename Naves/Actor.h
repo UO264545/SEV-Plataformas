@@ -25,5 +25,8 @@ public:
 
 	bool containsPoint(int pointX, int pointY); //Contiene punto
 	bool clicked;
+
+	bool outRight;
+	bool outLeft;
 };
 

@@ -51,9 +51,6 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Archivos de origen\Actores</Filter>
     </ClCompile>
-    <ClCompile Include="Projectile.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -74,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="MenuLayer.cpp">
       <Filter>Archivos de origen\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Archivos de origen\Actores</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

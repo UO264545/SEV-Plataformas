@@ -37,6 +37,22 @@ void Enemy::update() {
 			vxIntelligence = vxIntelligence * -1;
 			vx = vxIntelligence;
 		}
+
+		// No caer por los lados
+		if (outRight) {
+			// mover hacia la izquierda vx tiene que ser negativa
+			if (vxIntelligence > 0) {
+				vxIntelligence = vxIntelligence * -1;
+			}
+			vx = vxIntelligence;
+		}
+		if (outLeft) {
+			// mover hacia la derecha vx tiene que ser positiva
+			if (vxIntelligence < 0) {
+				vxIntelligence = vxIntelligence * -1;
+			}
+			vx = vxIntelligence;
+		}
 	}
 	else
 		vx = 0;

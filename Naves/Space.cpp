@@ -12,9 +12,11 @@ void Space::addDynamicActor(Actor* actor) {
 void Space::addStaticActor(Actor * actor) {
 	staticActors.push_back(actor);
 }
+
 void Space::removeDynamicActor(Actor* actor) {
 	dynamicActors.remove(actor);
 }
+
 void Space::removeStaticActor(Actor* actor) {
 	staticActors.remove(actor);
 }
@@ -28,6 +30,9 @@ void Space::update() {
 
 		// Aun no se han detectado choques
 		actor->collisionDown = false;
+
+		actor->outLeft = true;
+		actor->outRight = true;
 
 		// Mover derecha / izquierda
 		updateMoveRight(actor);
@@ -112,6 +117,7 @@ void Space::updateMoveDown(Actor* dynamicAct) {
 		int downDynamic = dynamicAct->y + dynamicAct->height / 2;
 		int rightDynamic = dynamicAct->x + dynamicAct->width / 2;
 		int leftDynamic = dynamicAct->x - dynamicAct->width / 2;
+
 		for (auto const& staticAct : staticActors) {
 			int topStatic = staticAct->y - staticAct->height / 2;
 			int downStatic = staticAct->y + staticAct->height / 2;
@@ -129,6 +135,13 @@ void Space::updateMoveDown(Actor* dynamicAct) {
 					// Tenemos que actualizar el movimiento posible a uno menor
 					possibleMovement = topStatic - downDynamic;
 					dynamicAct->collisionDown = true;
+
+					if (rightDynamic <= rightStatic) {
+						dynamicAct->outRight = false;
+					}
+					if (leftDynamic >= leftStatic) {
+						dynamicAct->outLeft = false;
+					}
 				}
 			}
 		}
