@@ -227,8 +227,12 @@ void GameLayer::update() {
 		init();
 	}
 
-	if (player->y > HEIGHT + player->height) // cuando el personaje cae del todo
+	if (player->y > HEIGHT + player->height) {// cuando el personaje cae del todo
+		message = new Actor("res/mensaje_perder.png", WIDTH * 0.5, HEIGHT * 0.5,
+			WIDTH, HEIGHT, game);
+		pause = true;
 		init();
+	}
 
 	space->update();
 	background->update();
@@ -260,6 +264,9 @@ void GameLayer::update() {
 		if (player->isOverlap(enemy)) {
 			player->loseLife();
 			if (player->lifes <= 0) {
+				message = new Actor("res/mensaje_perder.png", WIDTH * 0.5, HEIGHT * 0.5,
+					WIDTH, HEIGHT, game);
+				pause = true;
 				init();
 				return; // Cortar el for
 			}
