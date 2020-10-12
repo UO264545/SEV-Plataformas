@@ -14,7 +14,7 @@ public:
 	void collide();
 
 	void update();
-	void draw(float scrollX = 0) override;
+	void draw(float scrollX = 0, float scrollY = 0) override;
 
 	Animation* animationBreak;
 };

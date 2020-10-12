@@ -58,8 +58,8 @@ void Enemy::update() {
 		vx = 0;
 }
 
-void Enemy::draw(float scrollX) {
-	animation->draw(x - scrollX, y);
+void Enemy::draw(float scrollX, float scrollY) {
+	animation->draw(x - scrollX, y - scrollY);
 }
 
 void Enemy::impacted() {

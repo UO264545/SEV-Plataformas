@@ -6,8 +6,8 @@ class Actor
 public:
 	Actor(std::string filename, float x, float y, int width, int height, Game* game);
 	~Actor();
-	virtual void draw(float scrollX = 0);
-	bool isInRender(float scrollX = 0);
+	virtual void draw(float scrollX = 0, float scrollY = 0);
+	bool isInRender(float scrollX = 0, float scrollY = 0);
 	bool isOverlap(Actor* actor);
 
 	bool collisionDown;

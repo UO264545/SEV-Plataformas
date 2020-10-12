@@ -16,6 +16,7 @@ void GameLayer::init() {
 
 	space = new Space(1);
 	scrollX = 0;
+	scrollY = 0;
 	tiles.clear();
 
 	audioBackground = new Audio("res/musica_ambiente.mp3", true);
@@ -229,7 +230,7 @@ void GameLayer::update() {
 		init();
 	}
 
-	if (player->y > HEIGHT + player->height) {// cuando el personaje cae del todo
+	if (player->y > HEIGHT + player->height + scrollY) {// cuando el personaje cae del todo
 		message = new Actor("res/mensaje_perder.png", WIDTH * 0.5, HEIGHT * 0.5,
 			WIDTH, HEIGHT, game);
 		pause = true;
@@ -366,7 +367,7 @@ void GameLayer::update() {
 void GameLayer::checkColisionShoot(std::list<Enemy*> &deleteEnemies, std::list<Projectile*> &deleteProjectiles) {
 	for (auto const& projectile : projectiles) {
 		// Eliminar proyectiles que salen por la derecha
-		if (!projectile->isInRender(scrollX) || projectile->vx == 0) {
+		if (!projectile->isInRender(scrollX, scrollY) || projectile->vx == 0) {
 			bool pInList = std::find(deleteProjectiles.begin(),
 				deleteProjectiles.end(),
 				projectile) != deleteProjectiles.end();
@@ -408,26 +409,26 @@ void GameLayer::draw() {
 	//primero el background y después el player, sino no se ve el player
 	background->draw();
 	for (auto const& tile : tiles)
-		tile->draw(scrollX);
+		tile->draw(scrollX, scrollY);
 
-	cup->draw(scrollX);
+	cup->draw(scrollX, scrollY);
 
-	player->draw(scrollX);
+	player->draw(scrollX, scrollY);
 
 	for (auto const& enemy : enemies) {
-		enemy->draw(scrollX);
+		enemy->draw(scrollX, scrollY);
 	}
 
 	for (auto const& projectile : projectiles) {
-		projectile->draw(scrollX);
+		projectile->draw(scrollX, scrollY);
 	}
 
 	for (auto const& block : destructibleBlocks) {
-		block->draw(scrollX);
+		block->draw(scrollX, scrollY);
 	}
 
 	for (auto const& block : iceBlocks) {
-		block->draw(scrollX);
+		block->draw(scrollX, scrollY);
 	}
 
 	// HUD
@@ -538,6 +539,20 @@ void GameLayer::calculateScroll() {
 	if (player->x < mapWidth - WIDTH * 0.3) { // Dentro del límite del mapa
 		if (player->x - scrollX > WIDTH * 0.7) {
 			scrollX = player->x - WIDTH * 0.7;
+		}
+	}
+
+	// limite arriba
+	if (player->y > HEIGHT * 0.3) {// Dentro del límite del mapa
+		if (player->y - scrollY < HEIGHT * 0.3) {
+			scrollY = player->y - HEIGHT * 0.3;
+		}
+	}
+
+	// limite abajo
+	if (player->y < mapWidth - HEIGHT * 0.3) { // Dentro del límite del mapa
+		if (player->y - scrollY > HEIGHT * 0.7) {
+			scrollY = player->y - HEIGHT * 0.7;
 		}
 	}
 }

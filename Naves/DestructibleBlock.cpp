@@ -21,9 +21,9 @@ void DestructibleBlock::update() {
 	}
 }
 
-void DestructibleBlock::draw(float scrollX) {
+void DestructibleBlock::draw(float scrollX, float scrollY) {
 	if (state == game->stateDying)
-		animationBreak->draw(x - scrollX, y);
+		animationBreak->draw(x - scrollX, y - scrollY);
 	else
-		Actor::draw(scrollX);
+		Actor::draw(scrollX, scrollY);
 }

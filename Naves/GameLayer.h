@@ -48,6 +48,7 @@ public:
 
 	void calculateScroll();
 	float scrollX;
+	float scrollY;
 
 	Space* space;
 
