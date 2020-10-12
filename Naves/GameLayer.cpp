@@ -38,6 +38,8 @@ void GameLayer::init() {
 	//enemies.push_back(new Enemy(300, 200, game));
 
 	destructibleBlocks.clear();
+	iceBlocks.clear();
+	doors.clear();
 
 	loadMap("res/" + std::to_string(game->currentLevel) + ".txt");
 
@@ -93,6 +95,13 @@ void GameLayer::processControls() {
 	}
 	// Eje Y
 	if (controlMoveY < 0) {
+		for (auto door : doors)
+			if (player->isOverlap(door)) {
+				player->moveTo(door->doorConnected->x, door->doorConnected->y);
+				controlMoveY = 0;
+				calculateScroll();
+				return;
+			}
 		player->jump();
 	}
 	
@@ -413,6 +422,10 @@ void GameLayer::draw() {
 
 	cup->draw(scrollX, scrollY);
 
+	for (auto const& door : doors) {
+		door->draw(scrollX, scrollY);
+	}
+
 	player->draw(scrollX, scrollY);
 
 	for (auto const& enemy : enemies) {
@@ -480,6 +493,20 @@ void GameLayer::loadMap(string name) {
 void GameLayer::loadMapObject(char character, float x, float y)
 {
 	switch (character) {
+	case '9':
+	case '8':
+	case '7':
+	case '5':
+	case '4': {
+		Door* door = new Door((int)character, x, y, game);
+		door->y = door->y - door->height / 2;
+		for (auto* door2 : doors)
+			if (door2->number == (int)character)
+				connectDoors(door, door2);
+		doors.push_back(door);
+		space->addDynamicActor(door);
+		break;
+	}
 	case 'W': {
 		IceBlock* block = new IceBlock(x, y, game);
 		block->y = block->y - block->height / 2;
@@ -555,4 +582,9 @@ void GameLayer::calculateScroll() {
 			scrollY = player->y - HEIGHT * 0.7;
 		}
 	}
+}
+
+void GameLayer::connectDoors(Door* door, Door* door2) {
+	door->doorConnected = door2;
+	door2->doorConnected = door;
 }

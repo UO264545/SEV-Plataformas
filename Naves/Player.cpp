@@ -154,3 +154,8 @@ void Player::loseLife() {
 		}
 	}
 }
+
+void Player::moveTo(float x, float y) {
+	this->x = x;
+	this->y = y;
+}
