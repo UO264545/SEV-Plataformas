@@ -26,6 +26,12 @@ void GameLayer::init() {
 	textPoints = new Text("hola", WIDTH * 0.92, HEIGHT * 0.04, game);
 	textPoints->content = std::to_string(points);
 
+	itemsCollected = 0;
+	textItems = new Text("", WIDTH * 0.57, HEIGHT * 0.11, game);
+	textItems->content = std::to_string(itemsCollected);
+
+	backgroundItems = new Actor("res/icono_recolectable.png", WIDTH * 0.5, HEIGHT * 0.11, 40, 40, game);
+
 	delete player; //borra el jugador anterior
 	//player = new Player(50, 50, game); Se crea cuando carga el mapa
 	background = new Background("res/fondo_2.png", WIDTH * 0.5, HEIGHT * 0.5, -1, game);
@@ -40,6 +46,7 @@ void GameLayer::init() {
 	destructibleBlocks.clear();
 	iceBlocks.clear();
 	doors.clear();
+	collectables.clear();
 
 	loadMap("res/" + std::to_string(game->currentLevel) + ".txt");
 
@@ -273,15 +280,27 @@ void GameLayer::update() {
 		block->update();
 	}
 
+	for (auto const& col : collectables) {
+		col->update();
+	}
+
 	// Colisiones
 	list<Enemy*> deleteEnemies;
 	list<Projectile*> deleteProjectiles;
 	list<DestructibleBlock*> deleteBlocks;
 	list<IceBlock*> deleteIceBlocks;
+	list<Collectable*> deleteCollectables;
 	
 	// Comprobar que el jugador está sobre los bloques de hielo
 	for (auto const& block : iceBlocks) {
 		block->checkCollision(player);
+	}
+
+	for (auto* col : collectables) {
+		if (col->isOverlap(player)) {
+			textItems->content = std::to_string(++itemsCollected);
+			deleteCollectables.push_back(col);
+		}
 	}
 
 	for (auto const& enemy : enemies) {
@@ -370,6 +389,12 @@ void GameLayer::update() {
 		space->removeStaticActor(delBlock);
 	}
 	deleteIceBlocks.clear();
+
+	for (auto const& delCol : deleteCollectables) {
+		collectables.remove(delCol);
+		space->removeDynamicActor(delCol);
+	}
+	deleteCollectables.clear();
 }
 
 // Colisión Enemy - Shoot
@@ -444,9 +469,15 @@ void GameLayer::draw() {
 		block->draw(scrollX, scrollY);
 	}
 
+	for (auto const& col : collectables) {
+		col->draw(scrollX, scrollY);
+	}
+
 	// HUD
 	textPoints->draw();
 	backgroundPoints->draw(); //asi no lo tapa un enemigo
+	textItems->draw();
+	backgroundItems->draw();
 	for (int i = 0; i < player->lifes; i++) {
 		backgroundLifes[i]->draw();
 	}
@@ -505,6 +536,13 @@ void GameLayer::loadMapObject(char character, float x, float y)
 				connectDoors(door, door2);
 		doors.push_back(door);
 		space->addDynamicActor(door);
+		break;
+	}
+	case 'R': {
+		Collectable* col = new Collectable(x, y, game);
+		col->y = col->y - col->height / 2;
+		collectables.push_back(col);
+		space->addDynamicActor(col);
 		break;
 	}
 	case 'W': {

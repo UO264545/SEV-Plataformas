@@ -13,6 +13,7 @@
 #include "DestructibleBlock.h"
 #include "IceBlock.h"
 #include "Door.h"
+#include "Collectable.h"
 
 #include <list>
 #include <fstream> // Leer ficheros
@@ -63,6 +64,11 @@ public:
 	std::list<DestructibleBlock*> destructibleBlocks;
 	std::list<IceBlock*> iceBlocks;
 	std::list<Door*> doors;
+	std::list<Collectable*> collectables;
+
+	int itemsCollected;
+	Text* textItems;
+	Actor* backgroundItems;
 
 	void connectDoors(Door* door1, Door* door2);
 
